@@ -48,7 +48,7 @@ namespace LazyTFFXIV.Services
             process.WaitForInputIdle();
 
             // 額外等待確保視窗完全載入
-            Thread.Sleep(delayMs);
+            Thread.Sleep(2000 + delayMs);
 
             // 輸入密碼（使用 SendWait 確保輸入完成）
             SendKeys.SendWait(EscapeSpecialCharacters(password));
