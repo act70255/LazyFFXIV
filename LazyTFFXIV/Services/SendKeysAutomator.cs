@@ -26,10 +26,10 @@ namespace LazyTFFXIV.Services
                 throw new ArgumentException("應用程式路徑不可為空", nameof(appPath));
             }
 
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                throw new ArgumentException("密碼不可為空", nameof(password));
-            }
+            //if (string.IsNullOrWhiteSpace(password))
+            //{
+            //    throw new ArgumentException("密碼不可為空", nameof(password));
+            //}
 
             if (string.IsNullOrWhiteSpace(otp))
             {
@@ -50,13 +50,16 @@ namespace LazyTFFXIV.Services
             // 額外等待確保視窗完全載入
             Thread.Sleep(2000 + delayMs);
 
-            // 輸入密碼（使用 SendWait 確保輸入完成）
-            SendKeys.SendWait(EscapeSpecialCharacters(password));
-            Thread.Sleep(delayMs);
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                // 輸入密碼（使用 SendWait 確保輸入完成）
+                SendKeys.SendWait(EscapeSpecialCharacters(password));
+                Thread.Sleep(delayMs);
 
-            // 按下 TAB 切換到 OTP 欄位
-            SendKeys.SendWait("{TAB}");
-            Thread.Sleep(delayMs);
+                // 按下 TAB 切換到 OTP 欄位
+                SendKeys.SendWait("{TAB}");
+                Thread.Sleep(delayMs);
+            }
 
             // 輸入 OTP
             SendKeys.SendWait(otp);

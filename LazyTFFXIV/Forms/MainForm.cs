@@ -39,6 +39,9 @@ namespace LazyTFFXIV.Forms
             // 初始化延遲設定
             InitializeDelayControl();
 
+            // 隱藏密碼相關 UI
+            HidePasswordControls();
+
             // 更新 UI 狀態
             UpdateUIStatus();
         }
@@ -70,6 +73,16 @@ namespace LazyTFFXIV.Forms
             // NumericUpDown 樣式
             nudDelay.BackColor = ThemeColors.InputBackground;
             nudDelay.ForeColor = ThemeColors.TextPrimary;
+        }
+
+        /// <summary>
+        /// 隱藏密碼相關控制項
+        /// </summary>
+        private void HidePasswordControls()
+        {
+            lblPasswordStatus.Visible = false;
+            pnlPasswordIndicator.Visible = false;
+            btnSetPassword.Visible = false;
         }
 
         /// <summary>
@@ -132,7 +145,6 @@ namespace LazyTFFXIV.Forms
 
             // 更新狀態指示燈
             UpdateStatusIndicator(pnlSecretKeyIndicator, lblSecretKeyStatus, hasKey, "TOTP 密鑰");
-            UpdateStatusIndicator(pnlPasswordIndicator, lblPasswordStatus, hasPassword, "登入密碼");
 
             // 應用程式路徑顯示完整路徑
             if (hasAppPath)
@@ -148,7 +160,7 @@ namespace LazyTFFXIV.Forms
             }
 
             // 更新執行按鈕狀態
-            btnRun.Enabled = hasKey && hasPassword && hasAppPath;
+            btnRun.Enabled = hasKey && hasAppPath;
             if (!btnRun.Enabled)
             {
                 btnRun.BackColor = ThemeColors.ButtonDisabled;
@@ -303,7 +315,7 @@ namespace LazyTFFXIV.Forms
             {
                 // 取得所有必要資料
                 string secretKey = _secretStorage.LoadSecretKey();
-                string password = _secretStorage.LoadPassword();
+                string password = _secretStorage.PasswordExists() ? _secretStorage.LoadPassword() : string.Empty;
                 string appPath = _configManager.LoadAppPath();
                 int delayMs = _configManager.LoadSendKeysDelay();
 
