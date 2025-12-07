@@ -50,79 +50,34 @@ namespace LazyTFFXIV.Services
             // 額外等待確保視窗完全載入
             Thread.Sleep(2000 + delayMs);
 
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                // 輸入密碼（使用 SendWait 確保輸入完成）
-                SendKeys.SendWait(EscapeSpecialCharacters(password));
-                Thread.Sleep(delayMs);
+            //if (!string.IsNullOrWhiteSpace(password))
+            //{
+            //    // 輸入密碼
+            //    OutputTexts(password, delayMs);
 
-                // 按下 TAB 切換到 OTP 欄位
-                SendKeys.SendWait("{TAB}");
-                Thread.Sleep(delayMs);
-            }
+            //    // 按下 TAB 切換到 OTP 欄位
+            //    SendKeys.SendWait("{TAB}");
+            //    Thread.Sleep(delayMs);
+            //}
 
             // 輸入 OTP
-            SendKeys.SendWait(otp);
-            Thread.Sleep(delayMs);
+            OutputTexts(otp, delayMs);
 
             // 按下 ENTER 送出登入
             SendKeys.SendWait("{ENTER}");
         }
 
         /// <summary>
-        /// 轉義 SendKeys 的特殊字元
-        /// SendKeys 中的特殊字元需要用大括號包起來
+        /// 將文字複製到剪貼板並模擬 Ctrl+V 貼上
         /// </summary>
-        /// <param name="input">原始輸入字串</param>
-        /// <returns>轉義後的字串</returns>
-        private string EscapeSpecialCharacters(string input)
+        /// <param name="text">要貼上的文字</param>
+        /// <param name="delayMs">延遲毫秒數</param>
+        private void OutputTexts(string text, int delayMs)
         {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            // SendKeys 特殊字元：+ ^ % ~ ( ) { } [ ]
-            // 需要用大括號轉義
-            var result = new System.Text.StringBuilder();
-            foreach (char c in input)
-            {
-                switch (c)
-                {
-                    case '+':
-                        result.Append("{+}");
-                        break;
-                    case '^':
-                        result.Append("{^}");
-                        break;
-                    case '%':
-                        result.Append("{%}");
-                        break;
-                    case '~':
-                        result.Append("{~}");
-                        break;
-                    case '(':
-                        result.Append("{(}");
-                        break;
-                    case ')':
-                        result.Append("{)}");
-                        break;
-                    case '{':
-                        result.Append("{{}");
-                        break;
-                    case '}':
-                        result.Append("{}}");
-                        break;
-                    case '[':
-                        result.Append("{[}");
-                        break;
-                    case ']':
-                        result.Append("{]}");
-                        break;
-                    default:
-                        result.Append(c);
-                        break;
-                }
-            }
-            return result.ToString();
+            Clipboard.SetText(text);
+            Thread.Sleep(delayMs);
+            SendKeys.SendWait("^v");
+            Thread.Sleep(delayMs);
         }
     }
 }
