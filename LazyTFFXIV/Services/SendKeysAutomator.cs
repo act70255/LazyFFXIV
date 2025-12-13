@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using LazyTFFXIV.Interfaces;
@@ -13,23 +14,18 @@ namespace LazyTFFXIV.Services
     {
         /// <summary>
         /// 啟動應用程式並執行自動登入
-        /// 輸入序列：[密碼] -> [TAB] -> [OTP] -> [ENTER]
+        /// 若應用程式目錄存在 account.txt，則逐行讀取帳號：[帳號] -> [TAB] -> [OTP] -> [ENTER]
+        /// 若不存在，則直接輸入：[OTP] -> [ENTER]
         /// </summary>
         /// <param name="appPath">應用程式路徑</param>
-        /// <param name="password">固定密碼</param>
         /// <param name="otp">一次性驗證碼</param>
         /// <param name="delayMs">每個按鍵之間的延遲毫秒數</param>
-        public void RunAndLogin(string appPath, string password, string otp, int delayMs)
+        public void RunAndLogin(string appPath, string otp, int delayMs)
         {
             if (string.IsNullOrWhiteSpace(appPath))
             {
                 throw new ArgumentException("應用程式路徑不可為空", nameof(appPath));
             }
-
-            //if (string.IsNullOrWhiteSpace(password))
-            //{
-            //    throw new ArgumentException("密碼不可為空", nameof(password));
-            //}
 
             if (string.IsNullOrWhiteSpace(otp))
             {
@@ -50,17 +46,32 @@ namespace LazyTFFXIV.Services
             // 額外等待確保視窗完全載入
             Thread.Sleep(2000 + delayMs);
 
-            //if (!string.IsNullOrWhiteSpace(password))
-            //{
-            //    // 輸入密碼
-            //    OutputTexts(password, delayMs);
+            // 取得應用程式目錄
+            string appDirectory = Path.GetDirectoryName(appPath);
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string accountFilePath = Path.Combine(currentDirectory, "account.txt");
 
-            //    // 按下 TAB 切換到 OTP 欄位
-            //    SendKeys.SendWait("{TAB}");
-            //    Thread.Sleep(delayMs);
-            //}
+            // 讀取帳號列表
+            string[] inputs = File.Exists(accountFilePath)
+                ? File.ReadAllLines(accountFilePath)
+                : new string[] { };
+            Debug.WriteLine($"讀取到 {inputs.Length} 組資料");
+            // 執行多帳號登入
+            foreach (string line in inputs)
+            {
+                Debug.WriteLine(line);
+                string account = line.Trim();
+                if (!string.IsNullOrEmpty(account))
+                {
+                    // 輸入帳號
+                    OutputTexts(account, delayMs);
 
-            // 輸入 OTP
+                    // 按下 TAB 切換到 OTP 欄位
+                    SendKeys.SendWait("{TAB}");
+                    Thread.Sleep(delayMs);
+                }
+            }
+            // 執行單一登入（只輸入 OTP）
             OutputTexts(otp, delayMs);
 
             // 按下 ENTER 送出登入

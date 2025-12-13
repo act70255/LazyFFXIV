@@ -315,7 +315,7 @@ namespace LazyTFFXIV.Forms
             {
                 // 取得所有必要資料
                 string secretKey = _secretStorage.LoadSecretKey();
-                string password = _secretStorage.PasswordExists() ? _secretStorage.LoadPassword() : string.Empty;
+                //string password = _secretStorage.PasswordExists() ? _secretStorage.LoadPassword() : string.Empty;
                 string appPath = _configManager.LoadAppPath();
                 int delayMs = _configManager.LoadSendKeysDelay();
 
@@ -337,7 +337,7 @@ namespace LazyTFFXIV.Forms
                 this.WindowState = FormWindowState.Minimized;
 
                 // 執行自動登入
-                _automator.RunAndLogin(appPath, password, otp, delayMs);
+                _automator.RunAndLogin(appPath, otp, delayMs);
             }
             catch (Exception ex)
             {
